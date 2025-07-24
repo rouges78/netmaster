@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetMaster - Dashboard Monitoraggio</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Chart.js per i grafici -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Date Adapter per gestione date -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-network-wired"></i>
+                <h1>NetMaster</h1>
+                <span class="version">v2.1</span>
+            </div>
+            <div class="header-info">
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fas fa-circle" id="statusIcon"></i>
+                    <span id="statusText">Connessione...</span>
+                </div>
+                <div class="last-update">
+                    Ultimo aggiornamento: <span id="lastUpdate">--:--:--</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active" data-section="overview">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Panoramica</span>
+                    </li>
+                    <li class="nav-item" data-section="agents">
+                        <i class="fas fa-desktop"></i>
+                        <span>Agent</span>
+                        <span class="badge" id="agentCount">0</span>
+                    </li>
+                    <li class="nav-item" data-section="history">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Storico</span>
+                    </li>
+                    <li class="nav-item" data-section="alerts">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Avvisi</span>
+                        <span class="badge alert" id="alertCount">0</span>
+                    </li>
+                    <li class="nav-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Impostazioni</span>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <div class="section-header">
+                    <h2>Panoramica Sistema</h2>
+                    <div class="refresh-controls">
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Aggiorna
+                        </button>
+                        <select id="refreshInterval" class="select">
+                            <option value="5000">5 secondi</option>
+                            <option value="10000" selected>10 secondi</option>
+                            <option value="30000">30 secondi</option>
+                            <option value="60000">1 minuto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalAgents">0</h3>
+                            <p>Agent Attivi</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+2</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon cpu">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="avgCpu">0%</h3>
+                            <p>CPU Media</p>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar" id="cpuProgress"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon memory">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="avgMemory">0%</h3>
+                            <p>RAM Media</p>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar" id="memoryProgress"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon disk">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="avgDisk">0%</h3>
+                            <p>Disco Medio</p>
+                        </div>
+                        <div class="stat-progress">
+                            <div class="progress-bar" id="diskProgress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Charts -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Utilizzo CPU Real-time</h3>
+                            <div class="chart-controls">
+                                <button class="btn btn-sm" data-timespan="1h">1h</button>
+                                <button class="btn btn-sm active" data-timespan="6h">6h</button>
+                                <button class="btn btn-sm" data-timespan="24h">24h</button>
+                            </div>
+                        </div>
+                        <canvas id="cpuChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Utilizzo Memoria Real-time</h3>
+                            <div class="chart-controls">
+                                <button class="btn btn-sm" data-timespan="1h">1h</button>
+                                <button class="btn btn-sm active" data-timespan="6h">6h</button>
+                                <button class="btn btn-sm" data-timespan="24h">24h</button>
+                            </div>
+                        </div>
+                        <canvas id="memoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- System Status Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Stato Agent</h3>
+                        <div class="table-controls">
+                            <input type="text" placeholder="Cerca agent..." class="search-input" id="agentSearch">
+                            <button class="btn btn-secondary" id="exportBtn">
+                                <i class="fas fa-download"></i>
+                                Esporta
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="agentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Hostname</th>
+                                    <th>IP Address</th>
+                                    <th>CPU</th>
+                                    <th>RAM</th>
+                                    <th>Disco</th>
+                                    <th>Ultimo Aggiornamento</th>
+                                    <th>Stato</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentsTableBody">
+                                <!-- Dati caricati dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agents Section -->
+            <section id="agents" class="section">
+                <div class="section-header">
+                    <h2>Gestione Agent</h2>
+                </div>
+                <div class="agents-grid" id="agentsGrid">
+                    <!-- Agent cards caricati dinamicamente -->
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="section">
+                <div class="section-header">
+                    <h2>Storico Dati</h2>
+                </div>
+                <div class="history-controls">
+                    <div class="date-range">
+                        <label>Da:</label>
+                        <input type="datetime-local" id="startDate">
+                        <label>A:</label>
+                        <input type="datetime-local" id="endDate">
+                        <button class="btn btn-primary" id="loadHistoryBtn">Carica Dati</button>
+                    </div>
+                </div>
+                <div class="history-chart">
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section id="alerts" class="section">
+                <div class="section-header">
+                    <h2>Gestione Avvisi</h2>
+                </div>
+                <div class="alerts-content">
+                    <div class="alerts-list" id="alertsList">
+                        <!-- Avvisi caricati dinamicamente -->
+                    </div>
+                    <div class="threshold-settings">
+                        <h3>Soglie di Allarme</h3>
+                        <form id="thresholdForm">
+                            <div class="form-group">
+                                <label>CPU (%)</label>
+                                <input type="number" id="cpuThreshold" min="1" max="100" value="80">
+                            </div>
+                            <div class="form-group">
+                                <label>Memoria (%)</label>
+                                <input type="number" id="memoryThreshold" min="1" max="100" value="85">
+                            </div>
+                            <div class="form-group">
+                                <label>Disco (%)</label>
+                                <input type="number" id="diskThreshold" min="1" max="100" value="90">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Salva Soglie</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h2>Impostazioni Sistema</h2>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-group">
+                        <h3>Notifiche Email</h3>
+                        <form id="emailForm">
+                            <div class="form-group">
+                                <label>Server SMTP</label>
+                                <input type="text" id="smtpServer" placeholder="smtp.gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Porta</label>
+                                <input type="number" id="smtpPort" value="587">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Mittente</label>
+                                <input type="email" id="senderEmail" placeholder="netmaster@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="emailPassword">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Destinatario</label>
+                                <input type="email" id="recipientEmail" placeholder="admin@example.com">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Salva Configurazione</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Caricamento dati...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer">
+        <!-- Toast notifications dinamiche -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/api.js"></script>
+</body>
+</html>

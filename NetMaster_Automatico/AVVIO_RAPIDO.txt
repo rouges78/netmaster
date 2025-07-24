@@ -1,0 +1,8 @@
+NETMASTER - AVVIO RAPIDO
+
+1. Doppio click su NetMaster.exe
+2. Attendi la notifica di avvio
+3. Il browser si apre automaticamente
+4. Login: admin / password
+
+Tutto automatico!

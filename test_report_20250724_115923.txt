@@ -1,0 +1,6 @@
+NetMaster Test Report
+Data: 2025-07-24 11:59:24
+Durata: 8.15 secondi
+Test API: FALLITO
+Test Integrazione: SUCCESSO
+Risultato Generale: FALLITO

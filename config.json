@@ -1,0 +1,9 @@
+{
+    "server_url": "https://localhost:5000/api/report",
+    "collection_interval": 60,
+    "server_host": "localhost",
+    "server_port": 5000,
+    "verify_ssl": false,
+    "_note": "Le credenziali sono ora gestite tramite variabili d'ambiente. Vedi .env.example per la configurazione.",
+    "_ssl_note": "verify_ssl: false per certificati auto-firmati (sviluppo), true per certificati validi (produzione)"
+}

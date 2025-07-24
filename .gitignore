@@ -1,0 +1,83 @@
+# NetMaster Monitoring Suite - .gitignore
+
+# Credenziali sensibili
+.env
+*.env
+.env.local
+.env.production
+
+# File di configurazione con password (deprecato ma per sicurezza)
+config_local.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Log files
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+.venv.old/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+
+# Backup files
+*.bak
+*.backup
+
+# SSL certificates (se generati localmente)
+*.pem
+*.key
+*.crt
+*.cert
+certificates/
